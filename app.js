@@ -1,4 +1,3 @@
-//These import necessary modules and set some initial variables
 require('dotenv').config();
 const express = require('express');
 const rateLimit = require('express-rate-limit');
@@ -15,11 +14,10 @@ app.use(express.json());
 
 const port = 8080;
 
-// Rate limiting - Goodreads limits to 1/sec, so we should too
-
-// Enable if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
-// see https://expressjs.com/en/guide/behind-proxies.html
+// Reverse proxy
+// https://expressjs.com/en/guide/behind-proxies.html
 // app.set('trust proxy', 1);
+
 const authKey = process.env.REACT_APP_AZURE;
 const location = 'japaneast';
 
@@ -28,17 +26,13 @@ const limiter = rateLimit({
   max: 5, // limit each IP to 1 requests per windowMs
 });
 
-//  apply to all requests
 app.use(limiter);
-
-//app.options('*', cors());
 
 // Routes
 
-// Test route, visit localhost:3000 to confirm it's working
-// should show 'Hello World!' in the browser
+// Test route
 app.get('/', (req, res) => {
-  console.log('Naked / accessed.');
+  console.log('Root url / accessed.');
   res.send('Hello World!');
 });
 
@@ -77,9 +71,7 @@ app.post('/api/translate', async (req, res) => {
   }
 });
 
-// This spins up our sever and generates logs for us to use.
-// Any console.log statements you use in node for debugging will show up in your
-// terminal, not in the browser console!
+// Starts server
 app.listen(port, () => {
   console.log(`App listening on port ${port}!`);
 });
