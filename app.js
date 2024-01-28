@@ -9,6 +9,15 @@ const app = express();
 
 // Allow CORS from any origin
 // Change this for security!
+
+// app.use(
+//   cors({
+//     origin: 'http://localhost:3000/',
+//     methods: ['GET,POST'],
+//     // allowedHeaders: ['Content-Type', 'Authorization'],
+//     maxAge: 600,
+//   })
+// );
 app.use(cors());
 app.use(express.json());
 
@@ -21,12 +30,20 @@ const port = 8080;
 const authKey = process.env.REACT_APP_AZURE;
 const location = 'japaneast';
 
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // 100 requests per window
+  // Key function to use a shared limit for all IPs/users
+  keyGenerator: (req) => 'global',
+});
+
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 1 second
-  max: 5, // limit each IP to 1 requests per windowMs
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to x requests per windowMs
 });
 
 app.use(limiter);
+app.use(globalLimiter);
 
 // Routes
 
@@ -48,6 +65,7 @@ app.post('/api/translatetest', (req, res) => {
 });
 
 app.post('/api/translate', async (req, res) => {
+  // Add code to limit string length!
   console.log('api/translate/ called');
   try {
     console.log('Translate try started');
