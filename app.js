@@ -21,13 +21,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const port = 8080;
+const port = 3000;
 
 // Reverse proxy
 // https://expressjs.com/en/guide/behind-proxies.html
 // app.set('trust proxy', 1);
 
-const authKey = process.env.REACT_APP_AZURE;
+const authKey = process.env.BABEL_AZURE_KEY;
 const location = 'japaneast';
 
 const globalLimiter = rateLimit({
@@ -66,11 +66,17 @@ app.post('/api/translatetest', (req, res) => {
 
 app.post('/api/translate', async (req, res) => {
   // Add code to limit string length!
+
   console.log('api/translate/ called');
   try {
     console.log('Translate try started');
     console.log('Fetch String:' + req.body.fetchInfo);
     console.log(req.body.fetchBody);
+
+    if (req.body.fetchBody[0].Text.length > 50) {
+      console.log('Text is over maximum length.');
+      return res.json({ error: 'TOOLONG' });
+    }
 
     const response = await fetch(req.body.fetchInfo, {
       method: 'POST',
@@ -85,6 +91,7 @@ app.post('/api/translate', async (req, res) => {
     console.log(parsedResponse);
     return res.json(parsedResponse);
   } catch (err) {
+    console.log(err);
     return res.status(500).json(err.message);
   }
 });
